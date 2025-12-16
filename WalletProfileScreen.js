@@ -1,312 +1,307 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useRef, useContext } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
 import { colors } from './constants';
 import { MoreVertical, ChevronRight } from 'lucide-react-native';
+import { ThemeContext } from './App';
 
 export default function WalletProfileScreen() {
+  const lastTap = useRef(null);
+  const { theme, toggleTheme } = useContext(require('./App').ThemeContext);
+
+  // Double-tap handler for theme toggle
+  const handleBackgroundTap = (e) => {
+    const now = Date.now();
+    if (lastTap.current && now - lastTap.current < 300) {
+      toggleTheme();
+      lastTap.current = null;
+    } else {
+      lastTap.current = now;
+    }
+  };
+
+  // Helper for shiny effect
+  const shinyStyle = theme.background === '#000' ? { backgroundColor: theme.card, borderWidth: 1, borderColor: '#333', shadowColor: '#fff', shadowOpacity: 0.15, shadowRadius: 12, elevation: 4, overflow: 'hidden' } : { backgroundColor: theme.card };
+  const shinyButton = theme.background === '#000' ? { backgroundColor: theme.card, borderWidth: 1, borderColor: '#333', shadowColor: '#fff', shadowOpacity: 0.18, shadowRadius: 8, elevation: 2 } : { backgroundColor: theme.card };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Wallet & Profile</Text>
-          <TouchableOpacity style={styles.settingsIcon}>
-            <MoreVertical size={18} color="#000" />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}> 
+      <TouchableWithoutFeedback onPress={handleBackgroundTap}>
+        <View style={{ flex: 1 }}>
+          <ScrollView style={[styles.container, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
+            {/* Header */}
+            <View style={[styles.header]} pointerEvents="box-none">
+              <Text style={[styles.title, { color: theme.text }]}>Wallet & Profile</Text>
+              <TouchableOpacity style={styles.settingsIcon} activeOpacity={0.7}>
+                <MoreVertical size={18} color={theme.text} />
+              </TouchableOpacity>
+            </View>
 
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <View style={styles.profileHeader}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>CS</Text>
+            {/* Profile Section */}
+            <View style={[styles.profileSection, shinyStyle, { shadowColor: theme.shadow }]} pointerEvents="box-none">
+              <View style={styles.profileHeader}>
+                <View style={[styles.avatar, { backgroundColor: theme.accent }]}>
+                  <Text style={[styles.avatarText, { color: theme.walletText }]}>CS</Text>
+                </View>
+                <View style={styles.profileInfo}>
+                  <Text style={[styles.profileName, { color: theme.text }]}>Charlie Stanton</Text>
+                  <Text style={[styles.profileEmail, { color: theme.subtext }]}>charlie.stanton@email.com</Text>
+                  <Text style={[styles.membershipLevel, { color: theme.gold }]}>Gold Member</Text>
+                </View>
+              </View>
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statValue, { color: theme.text }]}>12</Text>
+                  <Text style={[styles.statLabel, { color: theme.subtext }]}>Flights</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statValue, { color: theme.text }]}>47,832</Text>
+                  <Text style={[styles.statLabel, { color: theme.subtext }]}>Miles</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={[styles.statValue, { color: theme.text }]}>8</Text>
+                  <Text style={[styles.statLabel, { color: theme.subtext }]}>Countries</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>Charlie Stanton</Text>
-              <Text style={styles.profileEmail}>charlie.stanton@email.com</Text>
-              <Text style={styles.membershipLevel}>Gold Member</Text>
-            </View>
-          </View>
-          
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>12</Text>
-              <Text style={styles.statLabel}>Flights</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>47,832</Text>
-              <Text style={styles.statLabel}>Miles</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>8</Text>
-              <Text style={styles.statLabel}>Countries</Text>
-            </View>
-          </View>
-        </View>
 
-        {/* Wallet Balance */}
-        <View style={styles.walletCard}>
-          <Text style={styles.walletTitle}>Wallet Balance</Text>
-          <Text style={styles.walletAmount}>$2,487.50</Text>
-          <Text style={styles.walletSubtext}>Available for bookings</Text>
-          
-          <View style={styles.walletActions}>
-            <TouchableOpacity style={styles.walletButton}>
-              <Text style={styles.walletButtonText}>Add Funds</Text>
+            {/* Wallet Balance */}
+            <View style={[styles.walletCard, { backgroundColor: theme.walletCard, shadowColor: theme.shadow, borderWidth: theme.background === '#000' ? 1 : 0, borderColor: theme.background === '#000' ? '#222' : 'transparent', shadowOpacity: theme.background === '#000' ? 0.18 : 0.08, elevation: 4 }]} pointerEvents="box-none">
+              <Text style={[styles.walletTitle, { color: theme.walletText, opacity: 0.8 }]}>Wallet Balance</Text>
+              <Text style={[styles.walletAmount, { color: theme.walletText }]}>$2,487.50</Text>
+              <Text style={[styles.walletSubtext, { color: theme.walletText, opacity: 0.7 }]}>Available for bookings</Text>
+              <View style={styles.walletActions}>
+                <TouchableOpacity style={[styles.walletButton, shinyButton]} activeOpacity={0.7}>
+                  <Text style={[styles.walletButtonText, { color: theme.text }]}>Add Funds</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.walletButton, styles.walletButtonSecondary, { borderColor: theme.walletText, ...shinyButton }]} activeOpacity={0.7}>
+                  <Text style={[styles.walletButtonText, styles.walletButtonTextSecondary, { color: theme.walletText }]}>Transfer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Payment Methods */}
+            <View style={styles.section} pointerEvents="box-none">
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Payment Methods</Text>
+              <View style={[styles.paymentCard, shinyStyle, { shadowColor: theme.shadow }]}> 
+                <View style={styles.paymentInfo}>
+                  <Text style={[styles.cardNumber, { color: theme.text }]}>•••• •••• •••• 4532</Text>
+                  <Text style={[styles.cardType, { color: theme.subtext }]}>Visa</Text>
+                </View>
+                <Text style={[styles.cardExpiry, { color: theme.subtext }]}>12/27</Text>
+              </View>
+              <View style={[styles.paymentCard, shinyStyle, { shadowColor: theme.shadow }]}> 
+                <View style={styles.paymentInfo}>
+                  <Text style={[styles.cardNumber, { color: theme.text }]}>•••• •••• •••• 8901</Text>
+                  <Text style={[styles.cardType, { color: theme.subtext }]}>Mastercard</Text>
+                </View>
+                <Text style={[styles.cardExpiry, { color: theme.subtext }]}>08/26</Text>
+              </View>
+              <TouchableOpacity style={[styles.addPaymentButton, shinyButton, { borderColor: theme.border }]} activeOpacity={0.7}>
+                <Text style={[styles.addPaymentText, { color: theme.accent }]}>+ Add Payment Method</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Recent Transactions */}
+            <View style={styles.section} pointerEvents="box-none">
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent Transactions</Text>
+              <View style={[styles.transactionItem, shinyStyle, { shadowColor: theme.shadow }]}> 
+                <View style={styles.transactionInfo}>
+                  <Text style={[styles.transactionTitle, { color: theme.text }]}>Flight to Warsaw</Text>
+                  <Text style={[styles.transactionDate, { color: theme.subtext }]}>Sep 16, 2024</Text>
+                </View>
+                <Text style={[styles.transactionAmount, { color: theme.error }]}>-$456.00</Text>
+              </View>
+              <View style={[styles.transactionItem, shinyStyle, { shadowColor: theme.shadow }]}> 
+                <View style={styles.transactionInfo}>
+                  <Text style={[styles.transactionTitle, { color: theme.text }]}>Lounge Access</Text>
+                  <Text style={[styles.transactionDate, { color: theme.subtext }]}>Sep 15, 2024</Text>
+                </View>
+                <Text style={[styles.transactionAmount, { color: theme.error }]}>-$45.00</Text>
+              </View>
+              <View style={[styles.transactionItem, shinyStyle, { shadowColor: theme.shadow }]}> 
+                <View style={styles.transactionInfo}>
+                  <Text style={[styles.transactionTitle, { color: theme.text }]}>Wallet Top-up</Text>
+                  <Text style={[styles.transactionDate, { color: theme.subtext }]}>Sep 10, 2024</Text>
+                </View>
+                <Text style={[styles.transactionAmount, styles.transactionCredit, { color: theme.credit }]}>+$500.00</Text>
+              </View>
+            </View>
+
+            {/* Profile Settings */}
+            <View style={styles.section} pointerEvents="box-none">
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Account Settings</Text>
+              <TouchableOpacity style={[styles.settingItem, shinyStyle, { shadowColor: theme.shadow }]} activeOpacity={0.7}>
+                <Text style={[styles.settingLabel, { color: theme.text }]}>Personal Information</Text>
+                <ChevronRight size={20} color={theme.subtext} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.settingItem, shinyStyle, { shadowColor: theme.shadow }]} activeOpacity={0.7}>
+                <Text style={[styles.settingLabel, { color: theme.text }]}>Travel Preferences</Text>
+                <ChevronRight size={20} color={theme.subtext} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.settingItem, shinyStyle, { shadowColor: theme.shadow }]} activeOpacity={0.7}>
+                <Text style={[styles.settingLabel, { color: theme.text }]}>Notifications</Text>
+                <ChevronRight size={20} color={theme.subtext} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.settingItem, shinyStyle, { shadowColor: theme.shadow }]} activeOpacity={0.7}>
+                <Text style={[styles.settingLabel, { color: theme.text }]}>Privacy & Security</Text>
+                <ChevronRight size={20} color={theme.subtext} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.settingItem, shinyStyle, { shadowColor: theme.shadow }]} activeOpacity={0.7}>
+                <Text style={[styles.settingLabel, { color: theme.text }]}>Help & Support</Text>
+                <ChevronRight size={20} color={theme.subtext} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Logout */}
+            <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.error, shadowColor: theme.shadow, shadowOpacity: theme.background === '#000' ? 0.18 : 0.08, elevation: 2 }]} activeOpacity={0.7}>
+              <Text style={[styles.logoutText, { color: theme.walletText }]}>Sign Out</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.walletButton, styles.walletButtonSecondary]}>
-              <Text style={[styles.walletButtonText, styles.walletButtonTextSecondary]}>Transfer</Text>
-            </TouchableOpacity>
-          </View>
+          </ScrollView>
         </View>
-
-        {/* Payment Methods */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Payment Methods</Text>
-          
-          <View style={styles.paymentCard}>
-            <View style={styles.paymentInfo}>
-              <Text style={styles.cardNumber}>•••• •••• •••• 4532</Text>
-              <Text style={styles.cardType}>Visa</Text>
-            </View>
-            <Text style={styles.cardExpiry}>12/27</Text>
-          </View>
-          
-          <View style={styles.paymentCard}>
-            <View style={styles.paymentInfo}>
-              <Text style={styles.cardNumber}>•••• •••• •••• 8901</Text>
-              <Text style={styles.cardType}>Mastercard</Text>
-            </View>
-            <Text style={styles.cardExpiry}>08/26</Text>
-          </View>
-          
-          <TouchableOpacity style={styles.addPaymentButton}>
-            <Text style={styles.addPaymentText}>+ Add Payment Method</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Recent Transactions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Transactions</Text>
-          
-          <View style={styles.transactionItem}>
-            <View style={styles.transactionInfo}>
-              <Text style={styles.transactionTitle}>Flight to Warsaw</Text>
-              <Text style={styles.transactionDate}>Sep 16, 2024</Text>
-            </View>
-            <Text style={styles.transactionAmount}>-$456.00</Text>
-          </View>
-          
-          <View style={styles.transactionItem}>
-            <View style={styles.transactionInfo}>
-              <Text style={styles.transactionTitle}>Lounge Access</Text>
-              <Text style={styles.transactionDate}>Sep 15, 2024</Text>
-            </View>
-            <Text style={styles.transactionAmount}>-$45.00</Text>
-          </View>
-          
-          <View style={styles.transactionItem}>
-            <View style={styles.transactionInfo}>
-              <Text style={styles.transactionTitle}>Wallet Top-up</Text>
-              <Text style={styles.transactionDate}>Sep 10, 2024</Text>
-            </View>
-            <Text style={[styles.transactionAmount, styles.transactionCredit]}>+$500.00</Text>
-          </View>
-        </View>
-
-        {/* Profile Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Personal Information</Text>
-            <ChevronRight size={20} color="#ccc" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Travel Preferences</Text>
-            <ChevronRight size={20} color="#ccc" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Notifications</Text>
-            <ChevronRight size={20} color="#ccc" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Privacy & Security</Text>
-            <ChevronRight size={20} color="#ccc" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Help & Support</Text>
-            <ChevronRight size={20} color="#ccc" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Logout */}
-        <TouchableOpacity style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Sign Out</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-    padding: 20,
-    marginTop: 32, // Add extra space below the status bar
+    paddingHorizontal: 20,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
     marginBottom: 24,
-    marginTop: 10,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
   },
   settingsIcon: {
-    width: 40,
-    height: 40,
+    padding: 8,
     borderRadius: 20,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  settingsText: {
-    fontSize: 18,
   },
   profileSection: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 24,
     shadowColor: '#000',
     shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 1,
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#007AFF',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 16,
   },
   avatarText: {
-    color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
+    color: '#fff',
   },
   profileInfo: {
     flex: 1,
   },
   profileName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   membershipLevel: {
     fontSize: 14,
     color: '#FFD700',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    justifyContent: 'space-between',
+    marginTop: 12,
   },
   statItem: {
     alignItems: 'center',
+    flex: 1,
   },
   statValue: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#666',
   },
   walletCard: {
     backgroundColor: '#000',
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    padding: 24,
+    marginBottom: 24,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 2,
+    alignItems: 'center',
   },
   walletTitle: {
-    color: '#fff',
     fontSize: 16,
-    marginBottom: 8,
+    color: '#fff',
     opacity: 0.8,
+    marginBottom: 4,
   },
   walletAmount: {
-    color: '#fff',
     fontSize: 32,
     fontWeight: 'bold',
+    color: '#fff',
     marginBottom: 4,
   },
   walletSubtext: {
-    color: '#fff',
     fontSize: 14,
+    color: '#fff',
     opacity: 0.7,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   walletActions: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
   },
   walletButton: {
-    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  walletButtonSecondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#fff',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    marginHorizontal: 6,
   },
   walletButtonText: {
     color: '#000',
-    fontWeight: '600',
-    fontSize: 14,
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  walletButtonSecondary: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#fff',
   },
   walletButtonTextSecondary: {
     color: '#fff',
@@ -435,3 +430,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+

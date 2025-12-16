@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Animated, Dimensions } from 'react-native';
 import { colors } from './constants';
 import * as Animatable from 'react-native-animatable';
 import { ArrowRight, Calendar, User } from 'lucide-react-native';
 
 export default function BookingScreen() {
   const [activeTab, setActiveTab] = useState('Upcoming');
+  const tabTranslate = useRef(new Animated.Value(0)).current;
+  const tabWidth = (Dimensions.get('window').width - 40 - 8) / 2; // paddingHorizontal: 20, tabContainer padding: 4
+
+  useEffect(() => {
+    Animated.spring(tabTranslate, {
+      toValue: activeTab === 'Upcoming' ? 0 : tabWidth,
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab, tabWidth]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -19,15 +29,26 @@ export default function BookingScreen() {
 
         {/* Tabs */}
         <View style={styles.tabContainer}>
+          <Animated.View
+            style={[
+              styles.animatedPill,
+              {
+                width: tabWidth,
+                transform: [{ translateX: tabTranslate }],
+              },
+            ]}
+          />
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'Upcoming' && styles.activeTab]}
+            style={styles.tab}
             onPress={() => setActiveTab('Upcoming')}
+            activeOpacity={0.8}
           >
             <Text style={[styles.tabText, activeTab === 'Upcoming' && styles.activeTabText]}>Upcoming</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'Past' && styles.activeTab]}
+            style={styles.tab}
             onPress={() => setActiveTab('Past')}
+            activeOpacity={0.8}
           >
             <Text style={[styles.tabText, activeTab === 'Past' && styles.activeTabText]}>Past</Text>
           </TouchableOpacity>
@@ -348,19 +369,27 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     padding: 4,
     marginBottom: 24,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  animatedPill: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    bottom: 4,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   tab: {
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
     borderRadius: 20,
-  },
-  activeTab: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    zIndex: 1,
   },
   tabText: {
     fontSize: 16,

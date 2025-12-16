@@ -1,175 +1,178 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-import { colors } from './constants';
 import { ArrowLeft, MoreVertical, ArrowRight, Bell, Clock, FileText, ChevronRight } from 'lucide-react-native';
+import { ThemeContext } from './App';
 
 export default function MyTicketScreen() {
+  const { theme } = useContext(require('./App').ThemeContext);
+
+  // Helper for shiny effect
+  const shinyStyle = theme.background === '#000' ? { backgroundColor: theme.card, borderWidth: 1, borderColor: '#222', shadowColor: '#fff', shadowOpacity: 0.15, shadowRadius: 12, elevation: 4, overflow: 'hidden' } : { backgroundColor: theme.card };
+  const shinyButton = theme.background === '#000' ? { backgroundColor: theme.card, borderWidth: 1, borderColor: '#222', shadowColor: '#fff', shadowOpacity: 0.18, shadowRadius: 8, elevation: 2 } : { backgroundColor: theme.card };
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}> 
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <ArrowLeft size={18} color="#000" />
+      <View style={[styles.header, { backgroundColor: theme.background }] }>
+        <TouchableOpacity style={[styles.backButton, shinyButton]}>
+          <ArrowLeft size={18} color={theme.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Ticket</Text>
-        <TouchableOpacity style={styles.menuButton}>
-          <MoreVertical size={18} color="#000" />
+        <Text style={[styles.headerTitle, { color: theme.text }]}>My Ticket</Text>
+        <TouchableOpacity style={[styles.menuButton, shinyButton]}>
+          <MoreVertical size={18} color={theme.text} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView style={[styles.container, { backgroundColor: theme.background }]} showsVerticalScrollIndicator={false}>
         {/* Boarding Pass Title */}
-        <Text style={styles.boardingPassTitle}>Boarding Pass</Text>
+        <Text style={[styles.boardingPassTitle, { color: theme.text }]}>Boarding Pass</Text>
 
         {/* Boarding Pass Card */}
-        <View style={styles.boardingCard}>
+        <View style={[styles.boardingCard, { backgroundColor: theme.walletCard, shadowColor: theme.shadow }] }>
           <View style={styles.flightRoute}>
             <View style={styles.departureInfo}>
-              <Text style={styles.cityLabel}>Jakarta</Text>
-              <Text style={styles.airport}>CGK</Text>
-              <Text style={styles.time}>14:35</Text>
+              <Text style={[styles.cityLabel, { color: theme.walletText }]}>Jakarta</Text>
+              <Text style={[styles.airport, { color: theme.walletText }]}>CGK</Text>
+              <Text style={[styles.time, { color: theme.walletText }]}>14:35</Text>
             </View>
-            
             <View style={styles.flightPath}>
-              <ArrowRight size={20} color="#fff" style={styles.planeIcon} />
-              <View style={styles.dottedLine} />
-              <Text style={styles.duration}>16h 30m</Text>
-              <View style={styles.dottedLine} />
+              <ArrowRight size={20} color={theme.walletText} style={styles.planeIcon} />
+              <View style={[styles.dottedLine, { backgroundColor: theme.walletText }]} />
+              <Text style={[styles.duration, { color: theme.credit }]}>16h 30m</Text>
+              <View style={[styles.dottedLine, { backgroundColor: theme.walletText }]} />
             </View>
-            
             <View style={styles.arrivalInfo}>
-              <Text style={styles.cityLabel}>Warsaw</Text>
-              <Text style={styles.airport}>WAW</Text>
-              <Text style={styles.time}>15:45</Text>
+              <Text style={[styles.cityLabel, { color: theme.walletText }]}>Warsaw</Text>
+              <Text style={[styles.airport, { color: theme.walletText }]}>WAW</Text>
+              <Text style={[styles.time, { color: theme.walletText }]}>15:45</Text>
             </View>
           </View>
-
-          <View style={styles.flightDetails}>
+          <View style={[styles.flightDetails, { borderTopColor: theme.border }] }>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Class</Text>
-              <Text style={styles.detailValue}>Economy</Text>
+              <Text style={[styles.detailLabel, { color: theme.walletText }]}>Class</Text>
+              <Text style={[styles.detailValue, { color: theme.walletText }]}>Economy</Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Terminal</Text>
-              <Text style={styles.detailValue}>F2</Text>
+              <Text style={[styles.detailLabel, { color: theme.walletText }]}>Terminal</Text>
+              <Text style={[styles.detailValue, { color: theme.walletText }]}>F2</Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Gate</Text>
-              <Text style={styles.detailValue}>32</Text>
+              <Text style={[styles.detailLabel, { color: theme.walletText }]}>Gate</Text>
+              <Text style={[styles.detailValue, { color: theme.walletText }]}>32</Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Seat</Text>
-              <Text style={styles.detailValue}>8A</Text>
+              <Text style={[styles.detailLabel, { color: theme.walletText }]}>Seat</Text>
+              <Text style={[styles.detailValue, { color: theme.walletText }]}>8A</Text>
             </View>
           </View>
         </View>
 
         {/* Ticket Code */}
-        <Text style={styles.ticketCodeText}>Ticket Code: C7G2K679H92</Text>
+        <Text style={[styles.ticketCodeText, { color: theme.subtext }]}>Ticket Code: C7G2K679H92</Text>
 
         {/* Barcode */}
         <View style={styles.barcodeContainer}>
-          <View style={styles.barcode}>
-            <Text style={styles.barcodeLines}>||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||</Text>
+          <View style={[styles.barcode, shinyStyle]}>
+            <Text style={[styles.barcodeLines, { color: theme.text }]}>||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||</Text>
           </View>
-          <Text style={styles.barcodeSubtext}>Scan this code to retrieve your ticket at the departure</Text>
+          <Text style={[styles.barcodeSubtext, { color: theme.subtext }]}>Scan this code to retrieve your ticket at the departure</Text>
         </View>
 
         {/* Download Button */}
-        <TouchableOpacity style={styles.downloadButton}>
-          <Text style={styles.downloadText}>Download E-Ticket</Text>
+        <TouchableOpacity style={[styles.downloadButton, { backgroundColor: theme.accent }]}>
+          <Text style={[styles.downloadText, { color: theme.walletText }]}>Download E-Ticket</Text>
         </TouchableOpacity>
 
         {/* Flight Alerts Section */}
-        <TouchableOpacity style={styles.sectionCard}>
+        <TouchableOpacity style={[styles.sectionCard, shinyStyle]}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIcon}>
-              <Bell size={18} color="#000" />
+            <View style={[styles.sectionIcon, { backgroundColor: theme.background === '#000' ? '#222' : '#f0f0f0' }]}>
+              <Bell size={18} color={theme.text} />
             </View>
-            <Text style={styles.sectionTitle}>Flight Alerts</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Flight Alerts</Text>
           </View>
-          <ChevronRight size={18} color="#ccc" />
+          <ChevronRight size={18} color={theme.border} />
         </TouchableOpacity>
 
-        <View style={styles.alertCard}>
-          <Text style={styles.alertTitle}>Gate Change</Text>
-          <Text style={styles.alertMessage}>Your departure gate has been changed from F1 to F2</Text>
-          <Text style={styles.alertTime}>2 hours ago</Text>
+        <View style={[styles.alertCard, shinyStyle]}>
+          <Text style={[styles.alertTitle, { color: theme.text }]}>Gate Change</Text>
+          <Text style={[styles.alertMessage, { color: theme.subtext }]}>Your departure gate has been changed from F1 to F2</Text>
+          <Text style={[styles.alertTime, { color: theme.subtext }]}>2 hours ago</Text>
         </View>
 
-        <View style={styles.alertCard}>
-          <Text style={styles.alertTitle}>Check-in Available</Text>
-          <Text style={styles.alertMessage}>Online check-in is now available for your flight</Text>
-          <Text style={styles.alertTime}>6 hours ago</Text>
+        <View style={[styles.alertCard, shinyStyle]}>
+          <Text style={[styles.alertTitle, { color: theme.text }]}>Check-in Available</Text>
+          <Text style={[styles.alertMessage, { color: theme.subtext }]}>Online check-in is now available for your flight</Text>
+          <Text style={[styles.alertTime, { color: theme.subtext }]}>6 hours ago</Text>
         </View>
 
         {/* Timeline Section */}
-        <TouchableOpacity style={styles.sectionCard}>
+        <TouchableOpacity style={[styles.sectionCard, shinyStyle]}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIcon}>
-              <Clock size={18} color="#000" />
+            <View style={[styles.sectionIcon, { backgroundColor: theme.background === '#000' ? '#222' : '#f0f0f0' }]}>
+              <Clock size={18} color={theme.text} />
             </View>
-            <Text style={styles.sectionTitle}>Timeline</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Timeline</Text>
           </View>
-          <ChevronRight size={18} color="#ccc" />
+          <ChevronRight size={18} color={theme.border} />
         </TouchableOpacity>
 
-        <View style={styles.timelineCard}>
+        <View style={[styles.timelineCard, shinyStyle]}>
           <View style={styles.timelineItem}>
-            <View style={styles.timelineDot} />
+            <View style={[styles.timelineDot, { backgroundColor: theme.border }]} />
             <View style={styles.timelineContent}>
-              <Text style={styles.timelineTitle}>Check-in Closes</Text>
-              <Text style={styles.timelineTime}>13:35 (1 hour before departure)</Text>
+              <Text style={[styles.timelineTitle, { color: theme.text }]}>Check-in Closes</Text>
+              <Text style={[styles.timelineTime, { color: theme.subtext }]}>13:35 (1 hour before departure)</Text>
             </View>
           </View>
           <View style={styles.timelineItem}>
-            <View style={[styles.timelineDot, styles.timelineDotActive]} />
+            <View style={[styles.timelineDot, styles.timelineDotActive, { backgroundColor: theme.credit }]} />
             <View style={styles.timelineContent}>
-              <Text style={styles.timelineTitle}>Boarding Begins</Text>
-              <Text style={styles.timelineTime}>14:05 (30 mins before departure)</Text>
+              <Text style={[styles.timelineTitle, { color: theme.text }]}>Boarding Begins</Text>
+              <Text style={[styles.timelineTime, { color: theme.subtext }]}>14:05 (30 mins before departure)</Text>
             </View>
           </View>
           <View style={styles.timelineItem}>
-            <View style={styles.timelineDot} />
+            <View style={[styles.timelineDot, { backgroundColor: theme.border }]} />
             <View style={styles.timelineContent}>
-              <Text style={styles.timelineTitle}>Departure</Text>
-              <Text style={styles.timelineTime}>14:35</Text>
+              <Text style={[styles.timelineTitle, { color: theme.text }]}>Departure</Text>
+              <Text style={[styles.timelineTime, { color: theme.subtext }]}>14:35</Text>
             </View>
           </View>
         </View>
 
         {/* Travel Docs Section */}
-        <TouchableOpacity style={styles.sectionCard}>
+        <TouchableOpacity style={[styles.sectionCard, shinyStyle]}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIcon}>
-              <FileText size={18} color="#000" />
+            <View style={[styles.sectionIcon, { backgroundColor: theme.background === '#000' ? '#222' : '#f0f0f0' }]}>
+              <FileText size={18} color={theme.text} />
             </View>
-            <Text style={styles.sectionTitle}>Travel Docs</Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Travel Docs</Text>
           </View>
-          <ChevronRight size={18} color="#ccc" />
+          <ChevronRight size={18} color={theme.border} />
         </TouchableOpacity>
 
-        <View style={styles.docCard}>
-          <Text style={styles.docTitle}>Passport Required</Text>
-          <Text style={styles.docMessage}>Make sure your passport is valid for at least 6 months</Text>
-          <TouchableOpacity style={styles.docButton}>
-            <Text style={styles.docButtonText}>View Requirements</Text>
+        <View style={[styles.docCard, shinyStyle]}>
+          <Text style={[styles.docTitle, { color: theme.text }]}>Passport Required</Text>
+          <Text style={[styles.docMessage, { color: theme.subtext }]}>Make sure your passport is valid for at least 6 months</Text>
+          <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
+            <Text style={[styles.docButtonText, { color: theme.walletText }]}>View Requirements</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.docCard}>
-          <Text style={styles.docTitle}>Visa Information</Text>
-          <Text style={styles.docMessage}>No visa required for your destination</Text>
-          <TouchableOpacity style={styles.docButton}>
-            <Text style={styles.docButtonText}>Learn More</Text>
+        <View style={[styles.docCard, shinyStyle]}>
+          <Text style={[styles.docTitle, { color: theme.text }]}>Visa Information</Text>
+          <Text style={[styles.docMessage, { color: theme.subtext }]}>No visa required for your destination</Text>
+          <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
+            <Text style={[styles.docButtonText, { color: theme.walletText }]}>Learn More</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.docCard}>
-          <Text style={styles.docTitle}>Travel Insurance</Text>
-          <Text style={styles.docMessage}>Consider purchasing travel insurance for your trip</Text>
-          <TouchableOpacity style={styles.docButton}>
-            <Text style={styles.docButtonText}>Get Quote</Text>
+        <View style={[styles.docCard, shinyStyle]}>
+          <Text style={[styles.docTitle, { color: theme.text }]}>Travel Insurance</Text>
+          <Text style={[styles.docMessage, { color: theme.subtext }]}>Consider purchasing travel insurance for your trip</Text>
+          <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
+            <Text style={[styles.docButtonText, { color: theme.walletText }]}>Get Quote</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
