@@ -1,10 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { ArrowLeft, MoreVertical, ArrowRight, Bell, Clock, FileText, ChevronRight } from 'lucide-react-native';
 import { ThemeContext } from './App';
 
 export default function MyTicketScreen() {
   const { theme } = useContext(require('./App').ThemeContext);
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [docsOpen, setDocsOpen] = useState(false);
+  const [timelineOpen, setTimelineOpen] = useState(false);
 
   // Helper for shiny effect
   const shinyStyle = theme.background === '#000' ? { backgroundColor: theme.card, borderWidth: 1, borderColor: '#222', shadowColor: '#fff', shadowOpacity: 0.15, shadowRadius: 12, elevation: 4, overflow: 'hidden' } : { backgroundColor: theme.card };
@@ -84,97 +87,107 @@ export default function MyTicketScreen() {
         </TouchableOpacity>
 
         {/* Flight Alerts Section */}
-        <TouchableOpacity style={[styles.sectionCard, shinyStyle]}>
+        <TouchableOpacity style={[styles.sectionCard, shinyStyle]} activeOpacity={0.8} onPress={() => setAlertsOpen(v => !v)}>
           <View style={styles.sectionHeader}>
             <View style={[styles.sectionIcon, { backgroundColor: theme.background === '#000' ? '#222' : '#f0f0f0' }]}>
               <Bell size={18} color={theme.text} />
             </View>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>Flight Alerts</Text>
           </View>
-          <ChevronRight size={18} color={theme.border} />
+          <ChevronRight size={18} color={theme.border} style={{ transform: [{ rotate: alertsOpen ? '90deg' : '0deg' }] }} />
         </TouchableOpacity>
 
-        <View style={[styles.alertCard, shinyStyle]}>
-          <Text style={[styles.alertTitle, { color: theme.text }]}>Gate Change</Text>
-          <Text style={[styles.alertMessage, { color: theme.subtext }]}>Your departure gate has been changed from F1 to F2</Text>
-          <Text style={[styles.alertTime, { color: theme.subtext }]}>2 hours ago</Text>
-        </View>
+        {alertsOpen && (
+          <>
+            <View style={[styles.alertCard, shinyStyle]}>
+              <Text style={[styles.alertTitle, { color: theme.text }]}>Gate Change</Text>
+              <Text style={[styles.alertMessage, { color: theme.subtext }]}>Your departure gate has been changed from F1 to F2</Text>
+              <Text style={[styles.alertTime, { color: theme.subtext }]}>2 hours ago</Text>
+            </View>
 
-        <View style={[styles.alertCard, shinyStyle]}>
-          <Text style={[styles.alertTitle, { color: theme.text }]}>Check-in Available</Text>
-          <Text style={[styles.alertMessage, { color: theme.subtext }]}>Online check-in is now available for your flight</Text>
-          <Text style={[styles.alertTime, { color: theme.subtext }]}>6 hours ago</Text>
-        </View>
+            <View style={[styles.alertCard, shinyStyle]}>
+              <Text style={[styles.alertTitle, { color: theme.text }]}>Check-in Available</Text>
+              <Text style={[styles.alertMessage, { color: theme.subtext }]}>Online check-in is now available for your flight</Text>
+              <Text style={[styles.alertTime, { color: theme.subtext }]}>6 hours ago</Text>
+            </View>
+          </>
+        )}
 
         {/* Timeline Section */}
-        <TouchableOpacity style={[styles.sectionCard, shinyStyle]}>
+        <TouchableOpacity style={[styles.sectionCard, shinyStyle]} activeOpacity={0.8} onPress={() => setTimelineOpen(v => !v)}>
           <View style={styles.sectionHeader}>
             <View style={[styles.sectionIcon, { backgroundColor: theme.background === '#000' ? '#222' : '#f0f0f0' }]}>
               <Clock size={18} color={theme.text} />
             </View>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>Timeline</Text>
           </View>
-          <ChevronRight size={18} color={theme.border} />
+          <ChevronRight size={18} color={theme.border} style={{ transform: [{ rotate: timelineOpen ? '90deg' : '0deg' }] }} />
         </TouchableOpacity>
 
-        <View style={[styles.timelineCard, shinyStyle]}>
-          <View style={styles.timelineItem}>
-            <View style={[styles.timelineDot, { backgroundColor: theme.border }]} />
-            <View style={styles.timelineContent}>
-              <Text style={[styles.timelineTitle, { color: theme.text }]}>Check-in Closes</Text>
-              <Text style={[styles.timelineTime, { color: theme.subtext }]}>13:35 (1 hour before departure)</Text>
+        {timelineOpen && (
+          <View style={[styles.timelineCard, shinyStyle]}>
+            <View style={styles.timelineItem}>
+              <View style={[styles.timelineDot, { backgroundColor: theme.border }]} />
+              <View style={styles.timelineContent}>
+                <Text style={[styles.timelineTitle, { color: theme.text }]}>Check-in Closes</Text>
+                <Text style={[styles.timelineTime, { color: theme.subtext }]}>13:35 (1 hour before departure)</Text>
+              </View>
+            </View>
+            <View style={styles.timelineItem}>
+              <View style={[styles.timelineDot, styles.timelineDotActive, { backgroundColor: theme.credit }]} />
+              <View style={styles.timelineContent}>
+                <Text style={[styles.timelineTitle, { color: theme.text }]}>Boarding Begins</Text>
+                <Text style={[styles.timelineTime, { color: theme.subtext }]}>14:05 (30 mins before departure)</Text>
+              </View>
+            </View>
+            <View style={styles.timelineItem}>
+              <View style={[styles.timelineDot, { backgroundColor: theme.border }]} />
+              <View style={styles.timelineContent}>
+                <Text style={[styles.timelineTitle, { color: theme.text }]}>Departure</Text>
+                <Text style={[styles.timelineTime, { color: theme.subtext }]}>14:35</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.timelineItem}>
-            <View style={[styles.timelineDot, styles.timelineDotActive, { backgroundColor: theme.credit }]} />
-            <View style={styles.timelineContent}>
-              <Text style={[styles.timelineTitle, { color: theme.text }]}>Boarding Begins</Text>
-              <Text style={[styles.timelineTime, { color: theme.subtext }]}>14:05 (30 mins before departure)</Text>
-            </View>
-          </View>
-          <View style={styles.timelineItem}>
-            <View style={[styles.timelineDot, { backgroundColor: theme.border }]} />
-            <View style={styles.timelineContent}>
-              <Text style={[styles.timelineTitle, { color: theme.text }]}>Departure</Text>
-              <Text style={[styles.timelineTime, { color: theme.subtext }]}>14:35</Text>
-            </View>
-          </View>
-        </View>
+        )}
 
         {/* Travel Docs Section */}
-        <TouchableOpacity style={[styles.sectionCard, shinyStyle]}>
+        <TouchableOpacity style={[styles.sectionCard, shinyStyle]} activeOpacity={0.8} onPress={() => setDocsOpen(v => !v)}>
           <View style={styles.sectionHeader}>
             <View style={[styles.sectionIcon, { backgroundColor: theme.background === '#000' ? '#222' : '#f0f0f0' }]}>
               <FileText size={18} color={theme.text} />
             </View>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>Travel Docs</Text>
           </View>
-          <ChevronRight size={18} color={theme.border} />
+          <ChevronRight size={18} color={theme.border} style={{ transform: [{ rotate: docsOpen ? '90deg' : '0deg' }] }} />
         </TouchableOpacity>
 
-        <View style={[styles.docCard, shinyStyle]}>
-          <Text style={[styles.docTitle, { color: theme.text }]}>Passport Required</Text>
-          <Text style={[styles.docMessage, { color: theme.subtext }]}>Make sure your passport is valid for at least 6 months</Text>
-          <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
-            <Text style={[styles.docButtonText, { color: theme.walletText }]}>View Requirements</Text>
-          </TouchableOpacity>
-        </View>
+        {docsOpen && (
+          <>
+            <View style={[styles.docCard, shinyStyle]}>
+              <Text style={[styles.docTitle, { color: theme.text }]}>Passport Required</Text>
+              <Text style={[styles.docMessage, { color: theme.subtext }]}>Make sure your passport is valid for at least 6 months</Text>
+              <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
+                <Text style={[styles.docButtonText, { color: theme.walletText }]}>View Requirements</Text>
+              </TouchableOpacity>
+            </View>
 
-        <View style={[styles.docCard, shinyStyle]}>
-          <Text style={[styles.docTitle, { color: theme.text }]}>Visa Information</Text>
-          <Text style={[styles.docMessage, { color: theme.subtext }]}>No visa required for your destination</Text>
-          <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
-            <Text style={[styles.docButtonText, { color: theme.walletText }]}>Learn More</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={[styles.docCard, shinyStyle]}>
+              <Text style={[styles.docTitle, { color: theme.text }]}>Visa Information</Text>
+              <Text style={[styles.docMessage, { color: theme.subtext }]}>No visa required for your destination</Text>
+              <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
+                <Text style={[styles.docButtonText, { color: theme.walletText }]}>Learn More</Text>
+              </TouchableOpacity>
+            </View>
 
-        <View style={[styles.docCard, shinyStyle]}>
-          <Text style={[styles.docTitle, { color: theme.text }]}>Travel Insurance</Text>
-          <Text style={[styles.docMessage, { color: theme.subtext }]}>Consider purchasing travel insurance for your trip</Text>
-          <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
-            <Text style={[styles.docButtonText, { color: theme.walletText }]}>Get Quote</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={[styles.docCard, shinyStyle]}>
+              <Text style={[styles.docTitle, { color: theme.text }]}>Travel Insurance</Text>
+              <Text style={[styles.docMessage, { color: theme.subtext }]}>Consider purchasing travel insurance for your trip</Text>
+              <TouchableOpacity style={[styles.docButton, { backgroundColor: theme.accent }]}>
+                <Text style={[styles.docButtonText, { color: theme.walletText }]}>Get Quote</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

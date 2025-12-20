@@ -452,29 +452,41 @@ const styles = StyleSheet.create({
   routeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
   airportContainer: {
-    flex: 1,
+    width: 120,
     alignItems: 'center',
   },
   cityLabel: {
     fontSize: 14,
     color: '#000',
     fontWeight: '500',
+    textAlign: 'center',
+    includeFontPadding: false,
+    flexWrap: 'nowrap',
   },
   airport: {
     fontSize: 12,
     color: '#007AFF',
     fontWeight: '600',
+    textAlign: 'center',
+    includeFontPadding: false,
+    flexWrap: 'nowrap',
   },
   time: {
     fontSize: 12,
     color: '#666',
+    textAlign: 'center',
+    includeFontPadding: false,
+    flexWrap: 'nowrap',
   },
   flightPath: {
+    width: 48,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginHorizontal: 8,
   },
   planeIcon: {
