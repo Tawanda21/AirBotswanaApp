@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-import { ArrowLeft, MoreVertical, ArrowRight, Bell, Clock, FileText, ChevronRight } from 'lucide-react-native';
+import { MoreVertical, ArrowRight, Bell, Clock, FileText, ChevronRight } from 'lucide-react-native';
 import { ThemeContext } from './App';
 
 export default function MyTicketScreen() {
-  const { theme } = useContext(require('./App').ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
   const [timelineOpen, setTimelineOpen] = useState(false);
@@ -17,11 +17,9 @@ export default function MyTicketScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}> 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.background }] }>
-        <TouchableOpacity style={[styles.backButton, shinyButton]}>
-          <ArrowLeft size={18} color={theme.text} />
-        </TouchableOpacity>
+        <View style={styles.headerSpacer} />
         <Text style={[styles.headerTitle, { color: theme.text }]}>My Ticket</Text>
-        <TouchableOpacity style={[styles.menuButton, shinyButton]}>
+        <TouchableOpacity style={styles.menuButton}>
           <MoreVertical size={18} color={theme.text} />
         </TouchableOpacity>
       </View>
@@ -206,39 +204,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#f8f9fa',
+    marginTop: 32,
+    marginBottom: 24,
+  },
+  headerSpacer: {
+    width: 32,
+    height: 32,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   backArrow: {
     fontSize: 18,
     color: '#000',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
   },
   menuButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   menuDots: {
     fontSize: 18,
@@ -509,7 +501,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   docButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#40C4D4',
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 16,

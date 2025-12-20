@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   },
   airport: {
     fontSize: 12,
-    color: '#007AFF',
+    color: '#40C4D4',
     fontWeight: '600',
     textAlign: 'center',
     includeFontPadding: false,
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
   },
   nextFlightAirport: {
     fontSize: 16,
-    color: '#007AFF',
+    color: '#40C4D4',
     fontWeight: '600',
     marginRight: 4,
   },

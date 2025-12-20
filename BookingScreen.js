@@ -1,25 +1,26 @@
 
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Modal } from 'react-native';
-import { ArrowLeft, MoreVertical, Calendar, ChevronRight } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Modal, TextInput } from 'react-native';
+import { MoreVertical, Calendar, ChevronRight, Search } from 'lucide-react-native';
 import { ThemeContext } from './App';
 
 export default function BookingScreen() {
   const { theme } = useContext(ThemeContext);
 
-  const cities = [
-    'Gaborone',
-    'Maun',
-    'Kasane',
-    'Francistown',
-    'Johannesburg',
-    'Cape Town',
-    'Durban',
-    'Windhoek',
-    'Lusaka',
-    'Maputo',
-    'Bulawayo',
-    'Victoria Falls',
+  const airports = [
+    { code: 'CPT', name: 'Cape Town Intl', city: 'Cape Town', country: 'South Africa', color: '#3DBAE5' },
+    { code: 'FRW', name: 'Phillip Gaonwe Matante Intl', city: 'Francistown', country: 'Botswana', color: '#40C4D4' },
+    { code: 'GBE', name: 'Sir Seretse Khama Intl', city: 'Gaborone', country: 'Botswana', color: '#40C4D4' },
+    { code: 'HRE', name: 'Robert Gabriel Mugabe Intl', city: 'Harare', country: 'Zimbabwe', color: '#40C4D4' },
+    { code: 'JNB', name: 'O.R. Tambo Intl', city: 'Johannesburg', country: 'South Africa', color: '#40C4D4' },
+    { code: 'BBK', name: 'Kasane', city: 'Kasane', country: 'Botswana', color: '#40C4D4' },
+    { code: 'LUN', name: 'Kenneth Kaunda Intl', city: 'Lusaka', country: 'Zambia', color: '#40C4D4' },
+    { code: 'MUB', name: 'Maun', city: 'Maun', country: 'Botswana', color: '#40C4D4' },
+    { code: 'MPM', name: 'Maputo International Airport', city: 'Maputo', country: 'Mozambique', color: '#40C4D4' },
+    { code: 'DUR', name: 'King Shaka International Airport', city: 'Durban', country: 'South Africa', color: '#40C4D4' },
+    { code: 'WDH', name: 'Hosea Kutako International Airport', city: 'Windhoek', country: 'Namibia', color: '#40C4D4' },
+    { code: 'BUQ', name: 'Joshua Mqabuko Nkomo Intl', city: 'Bulawayo', country: 'Zimbabwe', color: '#40C4D4' },
+    { code: 'VFA', name: 'Victoria Falls Airport', city: 'Victoria Falls', country: 'Zimbabwe', color: '#40C4D4' },
   ];
 
   const baseFlights = [
@@ -30,6 +31,7 @@ export default function BookingScreen() {
     { from: 'Gaborone', to: 'Windhoek', price: 'BWP 1,350', time: '15:10' },
     { from: 'Kasane', to: 'Victoria Falls', price: 'BWP 980', time: '10:30' },
     { from: 'Johannesburg', to: 'Maputo', price: 'BWP 1,620', time: '07:40' },
+    { from: 'Gaborone', to: 'Harare', price: 'BWP 1,420', time: '14:30' },
   ];
 
   const popularPlaces = [
@@ -58,6 +60,13 @@ export default function BookingScreen() {
   const [expandedFlightIndex, setExpandedFlightIndex] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(new Date(2024, 6, 15)); // July 2024
+  const [popularOpen, setPopularOpen] = useState(true);
+  const [festivalOpen, setFestivalOpen] = useState(true);
+  const [showReturnCalendar, setShowReturnCalendar] = useState(false);
+  const [returnCalendarMonth, setReturnCalendarMonth] = useState(new Date(2024, 6, 15));
+  const [customReturnDate, setCustomReturnDate] = useState(null);
+  const [fromSearchQuery, setFromSearchQuery] = useState('');
+  const [toSearchQuery, setToSearchQuery] = useState('');
 
   // Initialize flights on first load
   React.useEffect(() => {
@@ -75,8 +84,8 @@ export default function BookingScreen() {
   }, []);
 
   const generateFlights = (targetDate, fromCityIndex, toCityIndex) => {
-    const fromCity = cities[fromCityIndex];
-    const toCity = cities[toCityIndex];
+    const fromCity = airports[fromCityIndex].city;
+    const toCity = airports[toCityIndex].city;
     
     // Filter flights for the selected route
     const routeFlights = baseFlights.filter(
@@ -120,8 +129,9 @@ export default function BookingScreen() {
   };
 
   const handleCalendarDateSelect = (day) => {
-    const selected = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
-    const dateStr = selected.toISOString().split('T')[0];
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth() + 1;
+    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     
     // Find first available date >= selected date
     let targetDate = null;
@@ -163,6 +173,63 @@ export default function BookingScreen() {
     setExpandedFlightIndex(expandedFlightIndex === index ? null : index);
   };
 
+  const getFilteredFromAirports = () => {
+    if (!fromSearchQuery.trim()) return airports;
+    const query = fromSearchQuery.toLowerCase();
+    return airports.filter(airport => 
+      airport.city.toLowerCase().includes(query) ||
+      airport.name.toLowerCase().includes(query) ||
+      airport.code.toLowerCase().includes(query)
+    );
+  };
+
+  const getFilteredToAirports = () => {
+    if (!toSearchQuery.trim()) return airports;
+    const query = toSearchQuery.toLowerCase();
+    return airports.filter(airport => 
+      airport.city.toLowerCase().includes(query) ||
+      airport.name.toLowerCase().includes(query) ||
+      airport.code.toLowerCase().includes(query)
+    );
+  };
+
+  const handleQuickSelect = (destinationTitle) => {
+    const targetCity = destinationTitle.split(',')[0].trim();
+    const targetIndex = airports.findIndex(
+      (airport) => airport.city.toLowerCase() === targetCity.toLowerCase()
+    );
+
+    if (targetIndex === -1) {
+      return;
+    }
+
+    setToIndex(targetIndex);
+    setFromOpen(false);
+    setToOpen(false);
+
+    const currentDate = travelDates[dateIndex];
+    let flights = generateFlights(currentDate, fromIndex, targetIndex);
+    let nextDateIndex = dateIndex;
+
+    if (flights.length === 0) {
+      const result = findNextFlightDate(fromIndex, targetIndex);
+      if (result) {
+        flights = result.flights;
+        const idx = travelDates.indexOf(result.date);
+        if (idx >= 0) {
+          nextDateIndex = idx;
+          setDateIndex(idx);
+        }
+      }
+    }
+
+    setFlightOptions(flights);
+    setExpandedFlightIndex(null);
+    setPickingReturn(false);
+    setSelectedRoundTrip(null);
+    setShowFlights(flights.length > 0);
+  };
+
   const handleOneWay = (flight) => {
     setShowFlights(false);
     setExpandedFlightIndex(null);
@@ -172,6 +239,18 @@ export default function BookingScreen() {
     setSelectedRoundTrip(flight);
     setPickingReturn(true);
     setExpandedFlightIndex(null);
+    setReturnDateIndex(0);
+    setCustomReturnDate(null);
+    setShowReturnCalendar(false);
+  };
+
+  const handleReturnCalendarDateSelect = (day) => {
+    const year = returnCalendarMonth.getFullYear();
+    const month = returnCalendarMonth.getMonth() + 1;
+    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    setCustomReturnDate(dateStr);
+    setReturnDateIndex(-1);
+    setShowReturnCalendar(false);
   };
 
   const selectFromCity = (index) => {
@@ -215,11 +294,9 @@ export default function BookingScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}> 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.background }] }>
-        <TouchableOpacity style={[styles.backButton, shinyButton]}>
-          <ArrowLeft size={18} color={theme.text} />
-        </TouchableOpacity>
+        <View style={styles.headerSpacer} />
         <Text style={[styles.headerTitle, { color: theme.text }]}>Booking</Text>
-        <TouchableOpacity style={[styles.menuButton, shinyButton]}>
+        <TouchableOpacity style={styles.menuButton}>
           <MoreVertical size={18} color={theme.text} />
         </TouchableOpacity>
       </View>
@@ -232,40 +309,96 @@ export default function BookingScreen() {
         <View style={[styles.bookingCard, { backgroundColor: theme.card }, cardShadow]}>
           <TouchableOpacity style={styles.inputRow} activeOpacity={0.8} onPress={handleFromPress}>
             <Text style={[styles.inputLabel, { color: theme.text }]}>From</Text>
-            <Text style={[styles.inputValue, { color: theme.subtext }]}>{cities[fromIndex]}</Text>
+            <View>
+              <Text style={[styles.inputValue, { color: theme.subtext }]}>{airports[fromIndex].city}</Text>
+              <Text style={[styles.airportCode, { color: theme.subtext }]}>{airports[fromIndex].code}</Text>
+            </View>
           </TouchableOpacity>
           {fromOpen && (
-            <View style={[styles.dropdownContainer, { borderColor: theme.border, backgroundColor: theme.card }]}> 
-              {cities.map((city, index) => (
-                <TouchableOpacity
-                  key={city}
-                  style={[styles.dropdownOption, index === cities.length - 1 && styles.dropdownLast]}
-                  activeOpacity={0.8}
-                  onPress={() => selectFromCity(index)}
-                >
-                  <Text style={[styles.dropdownText, { color: theme.text }]}>{city}</Text>
-                  {index === fromIndex && <Text style={[styles.dropdownBadge, { color: theme.accent }]}>Selected</Text>}
-                </TouchableOpacity>
-              ))}
+            <View style={[styles.dropdownContainer, { borderColor: theme.border, backgroundColor: theme.card }]}>
+              <View style={[styles.searchContainer, { borderColor: theme.border }]}>
+                <Search size={18} color="#999" style={styles.searchIcon} />
+                <TextInput
+                  style={[styles.searchInput, { color: theme.text }]}
+                  placeholder="Search Airports"
+                  placeholderTextColor="#999"
+                  value={fromSearchQuery}
+                  onChangeText={setFromSearchQuery}
+                  autoFocus
+                />
+              </View>
+              <Text style={[styles.originLabel, { color: theme.accent }]}>Origin Airports</Text>
+              <ScrollView style={styles.airportList} nestedScrollEnabled>
+                {getFilteredFromAirports().map((airport, idx) => {
+                  const originalIndex = airports.findIndex(a => a.code === airport.code);
+                  return (
+                    <TouchableOpacity
+                      key={airport.code}
+                      style={[styles.airportItem]}
+                      activeOpacity={0.8}
+                      onPress={() => {
+                        selectFromCity(originalIndex);
+                        setFromSearchQuery('');
+                      }}
+                    >
+                      <View style={[styles.airportBadge, { backgroundColor: airport.color }]}>
+                        <Text style={styles.airportBadgeText}>{airport.code}</Text>
+                      </View>
+                      <View style={styles.airportInfo}>
+                        <Text style={[styles.airportCityCountry, { color: theme.text }]}>{airport.city}, {airport.country}</Text>
+                        <Text style={[styles.airportFullName, { color: theme.subtext }]}>{airport.name}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             </View>
           )}
           <TouchableOpacity style={styles.inputRow} activeOpacity={0.8} onPress={handleToPress}>
             <Text style={[styles.inputLabel, { color: theme.text }]}>To</Text>
-            <Text style={[styles.inputValue, { color: theme.subtext }]}>{cities[toIndex]}</Text>
+            <View>
+              <Text style={[styles.inputValue, { color: theme.subtext }]}>{airports[toIndex].city}</Text>
+              <Text style={[styles.airportCode, { color: theme.subtext }]}>{airports[toIndex].code}</Text>
+            </View>
           </TouchableOpacity>
           {toOpen && (
-            <View style={[styles.dropdownContainer, { borderColor: theme.border, backgroundColor: theme.card }]}> 
-              {cities.map((city, index) => (
-                <TouchableOpacity
-                  key={city}
-                  style={[styles.dropdownOption, index === cities.length - 1 && styles.dropdownLast]}
-                  activeOpacity={0.8}
-                  onPress={() => selectToCity(index)}
-                >
-                  <Text style={[styles.dropdownText, { color: theme.text }]}>{city}</Text>
-                  {index === toIndex && <Text style={[styles.dropdownBadge, { color: theme.accent }]}>Selected</Text>}
-                </TouchableOpacity>
-              ))}
+            <View style={[styles.dropdownContainer, { borderColor: theme.border, backgroundColor: theme.card }]}>
+              <View style={[styles.searchContainer, { borderColor: theme.border }]}>
+                <Search size={18} color="#999" style={styles.searchIcon} />
+                <TextInput
+                  style={[styles.searchInput, { color: theme.text }]}
+                  placeholder="Search Airports"
+                  placeholderTextColor="#999"
+                  value={toSearchQuery}
+                  onChangeText={setToSearchQuery}
+                  autoFocus
+                />
+              </View>
+              <Text style={[styles.originLabel, { color: theme.accent }]}>Origin Airports</Text>
+              <ScrollView style={styles.airportList} nestedScrollEnabled>
+                {getFilteredToAirports().map((airport, idx) => {
+                  const originalIndex = airports.findIndex(a => a.code === airport.code);
+                  return (
+                    <TouchableOpacity
+                      key={airport.code}
+                      style={[styles.airportItem]}
+                      activeOpacity={0.8}
+                      onPress={() => {
+                        selectToCity(originalIndex);
+                        setToSearchQuery('');
+                      }}
+                    >
+                      <View style={[styles.airportBadge, { backgroundColor: airport.color }]}>
+                        <Text style={styles.airportBadgeText}>{airport.code}</Text>
+                      </View>
+                      <View style={styles.airportInfo}>
+                        <Text style={[styles.airportCityCountry, { color: theme.text }]}>{airport.city}, {airport.country}</Text>
+                        <Text style={[styles.airportFullName, { color: theme.subtext }]}>{airport.name}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             </View>
           )}
           <TouchableOpacity style={styles.inputRow} activeOpacity={0.8} onPress={handleDatePress}>
@@ -346,28 +479,68 @@ export default function BookingScreen() {
           <ChevronRight size={18} color={theme.border} />
         </View>
 
-        {/* Popular Places Section */}
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Popular Places</Text>
-        {popularPlaces.map((item) => (
-          <View key={item.title} style={[styles.curationCard, { backgroundColor: theme.card }, cardShadow]}>
-            <View>
+        {/* Popular Places Section (collapsible) */}
+        <TouchableOpacity
+          style={[styles.sectionToggle, { borderColor: theme.border }]}
+          activeOpacity={0.8}
+          onPress={() => setPopularOpen((v) => !v)}
+        >
+          <Text style={[styles.sectionToggleTitle, { color: theme.text }]}>Popular Places</Text>
+          <ChevronRight
+            size={18}
+            color={theme.subtext}
+            style={{ transform: [{ rotate: popularOpen ? '90deg' : '0deg' }] }}
+          />
+        </TouchableOpacity>
+        {popularOpen && popularPlaces.map((item) => (
+          <TouchableOpacity
+            key={item.title}
+            style={[styles.curationCard, { backgroundColor: theme.card }, cardShadow]}
+            activeOpacity={0.8}
+            onPress={() => handleQuickSelect(item.title)}
+          >
+            <View style={styles.curationInfo}>
               <Text style={[styles.curationTitle, { color: theme.text }]}>{item.title}</Text>
               <Text style={[styles.curationBlurb, { color: theme.subtext }]}>{item.blurb}</Text>
             </View>
-            <Text style={[styles.curationPrice, { color: theme.accent }]}>{item.price}</Text>
-          </View>
+            <View style={styles.curationRight}>
+              <TouchableOpacity activeOpacity={0.8} onPress={() => handleQuickSelect(item.title)}>
+                <Text style={[styles.curationPrice, { color: theme.accent }]} numberOfLines={1}>{item.price}</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
         ))}
 
-        {/* Festival & Holiday Picks */}
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Festival & Holiday Picks</Text>
-        {festivalPlaces.map((item) => (
-          <View key={item.title} style={[styles.curationCard, { backgroundColor: theme.card }, cardShadow]}>
-            <View>
+        {/* Festival & Holiday Picks (collapsible) */}
+        <TouchableOpacity
+          style={[styles.sectionToggle, { borderColor: theme.border }]}
+          activeOpacity={0.8}
+          onPress={() => setFestivalOpen((v) => !v)}
+        >
+          <Text style={[styles.sectionToggleTitle, { color: theme.text }]}>Festival & Holiday Picks</Text>
+          <ChevronRight
+            size={18}
+            color={theme.subtext}
+            style={{ transform: [{ rotate: festivalOpen ? '90deg' : '0deg' }] }}
+          />
+        </TouchableOpacity>
+        {festivalOpen && festivalPlaces.map((item) => (
+          <TouchableOpacity
+            key={item.title}
+            style={[styles.curationCard, { backgroundColor: theme.card }, cardShadow]}
+            activeOpacity={0.8}
+            onPress={() => handleQuickSelect(item.title)}
+          >
+            <View style={styles.curationInfo}>
               <Text style={[styles.curationTitle, { color: theme.text }]}>{item.title}</Text>
               <Text style={[styles.curationBlurb, { color: theme.subtext }]}>{item.blurb}</Text>
             </View>
-            <Text style={[styles.curationPrice, { color: theme.accent }]}>{item.price}</Text>
-          </View>
+            <View style={styles.curationRight}>
+              <TouchableOpacity activeOpacity={0.8} onPress={() => handleQuickSelect(item.title)}>
+                <Text style={[styles.curationPrice, { color: theme.accent }]} numberOfLines={1}>{item.price}</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
 
@@ -393,7 +566,9 @@ export default function BookingScreen() {
                         <Text style={[styles.flightMeta, { color: theme.subtext }]}>Date: {flight.date} · {flight.time}</Text>
                       </View>
                       <View style={styles.flightRightSection}>
-                        <Text style={[styles.flightPrice, { color: theme.accent }]}>{flight.price}</Text>
+                        <TouchableOpacity activeOpacity={0.8} onPress={() => handleSelectFlight(idx)}>
+                          <Text style={[styles.flightPrice, { color: theme.accent }]}>{flight.price}</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity
                           style={[styles.selectButton, { backgroundColor: theme.accent }]}
                           onPress={() => handleSelectFlight(idx)}
@@ -441,7 +616,11 @@ export default function BookingScreen() {
                         styles.dateOption,
                         returnDateIndex === idx && [styles.dateOptionSelected, { backgroundColor: theme.accent }]
                       ]}
-                      onPress={() => setReturnDateIndex(idx)}
+                      onPress={() => {
+                        setReturnDateIndex(idx);
+                        setCustomReturnDate(null);
+                        setShowReturnCalendar(false);
+                      }}
                     >
                       <Text
                         style={[
@@ -455,22 +634,99 @@ export default function BookingScreen() {
                       </Text>
                     </TouchableOpacity>
                   ))}
+                  <TouchableOpacity
+                    style={[
+                      styles.dateOption,
+                      returnDateIndex === -1 && [styles.dateOptionSelected, { backgroundColor: theme.accent }]
+                    ]}
+                    onPress={() => {
+                      setReturnDateIndex(-1);
+                      setShowReturnCalendar((v) => !v);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.dateOptionText,
+                        returnDateIndex === -1
+                          ? { color: theme.walletText, fontWeight: '700' }
+                          : { color: theme.text }
+                      ]}
+                    >
+                      {customReturnDate ? `Custom: ${customReturnDate}` : 'Pick a custom date'}
+                    </Text>
+                  </TouchableOpacity>
+                  {showReturnCalendar && (
+                    <View style={[styles.calendarContainer, { backgroundColor: theme.background, borderColor: theme.border }]}>
+                      <View style={styles.calendarHeader}>
+                        <TouchableOpacity onPress={() => setReturnCalendarMonth(new Date(returnCalendarMonth.getFullYear(), returnCalendarMonth.getMonth() - 1))}>
+                          <Text style={[styles.calendarArrow, { color: theme.text }]}>‹</Text>
+                        </TouchableOpacity>
+                        <Text style={[styles.calendarTitle, { color: theme.text }]}>
+                          {returnCalendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        </Text>
+                        <TouchableOpacity onPress={() => setReturnCalendarMonth(new Date(returnCalendarMonth.getFullYear(), returnCalendarMonth.getMonth() + 1))}>
+                          <Text style={[styles.calendarArrow, { color: theme.text }]}>›</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={styles.weekdaysRow}>
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                          <Text key={day} style={[styles.weekday, { color: theme.subtext }]}>
+                            {day}
+                          </Text>
+                        ))}
+                      </View>
+                      <View style={styles.daysGrid}>
+                        {[...Array(getFirstDayOfMonth(returnCalendarMonth))].map((_, i) => (
+                          <View key={`return-empty-${i}`} style={styles.dayCell} />
+                        ))}
+                        {[...Array(getDaysInMonth(returnCalendarMonth))].map((_, i) => {
+                          const day = i + 1;
+                          const dateStr = `${returnCalendarMonth.getFullYear()}-${String(returnCalendarMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                          const isSelected = customReturnDate === dateStr;
+                          return (
+                            <TouchableOpacity
+                              key={`return-${day}`}
+                              style={[
+                                styles.dayCell,
+                                isSelected && [styles.dayCellSelected, { backgroundColor: theme.accent }]
+                              ]}
+                              onPress={() => handleReturnCalendarDateSelect(day)}
+                            >
+                              <Text
+                                style={[
+                                  styles.dayText,
+                                  isSelected ? { color: theme.walletText, fontWeight: '700' } : { color: theme.text }
+                                ]}
+                              >
+                                {day}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    </View>
+                  )}
                 </ScrollView>
                 <TouchableOpacity
                   style={[styles.confirmButton, { backgroundColor: theme.accent }]}
                   onPress={() => {
+                    const chosenReturnDate = returnDateIndex === -1 ? customReturnDate : travelDates[returnDateIndex] || travelDates[0];
+                    // In a full flow, persist chosenReturnDate with the booking payload
                     setShowFlights(false);
                     setSelectedRoundTrip(null);
                     setPickingReturn(false);
+                    setShowReturnCalendar(false);
+                    setCustomReturnDate(null);
+                    setReturnDateIndex(0);
                   }}
                 >
                   <Text style={[styles.confirmButtonText, { color: theme.walletText }]}>Confirm Round Trip</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.backButton, { borderColor: theme.border }]}
+                  style={[styles.modalBackButton, { borderColor: theme.border }]}
                   onPress={() => setPickingReturn(false)}
                 >
-                  <Text style={[styles.backButtonText, { color: theme.text }]}>Back</Text>
+                  <Text style={[styles.modalBackButtonText, { color: theme.text }]}>Back</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -494,30 +750,34 @@ const styles = StyleSheet.create({
     marginTop: 32, // Add extra space below the status bar
   },
   header: {
-    marginTop: 52,
-    marginBottom: 24,
-    paddingHorizontal: 20,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#f8f9fa',
+    marginTop: 32,
+    marginBottom: 24,
+  },
+  headerSpacer: {
+    width: 32,
+    height: 32,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   menuButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   subtitle: {
     fontSize: 14,
@@ -602,6 +862,75 @@ const styles = StyleSheet.create({
     marginTop: -6,
     marginBottom: 10,
     overflow: 'hidden',
+    maxHeight: 320,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#fff',
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 0,
+    color: '#000',
+  },
+  originLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    letterSpacing: 0.3,
+  },
+  airportList: {
+    maxHeight: 380,
+  },
+  airportItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  airportBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  airportBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  airportInfo: {
+    flex: 1,
+  },
+  airportCityCountry: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 3,
+  },
+  airportFullName: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  airportCode: {
+    fontSize: 11,
+    fontWeight: '600',
+    opacity: 0.6,
+    marginTop: 2,
   },
   dropdownOption: {
     paddingVertical: 10,
@@ -658,13 +987,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   flightContent: {
     flex: 1,
+    flexShrink: 1,
   },
   flightRightSection: {
     marginLeft: 12,
     alignItems: 'flex-end',
+    minWidth: 110,
+    flexShrink: 0,
+  },
+  flightRoute: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  flightMeta: {
+    fontSize: 13,
+  },
+  flightPrice: {
+    fontSize: 14,
+    fontWeight: '700',
   },
   selectButton: {
     marginTop: 6,
@@ -801,13 +1145,23 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-  backButton: {
+  closeButton: {
+    borderRadius: 14,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  closeButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  modalBackButton: {
     borderRadius: 14,
     borderWidth: 1,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  backButtonText: {
+  modalBackButtonText: {
     fontSize: 15,
     fontWeight: '700',
   },
@@ -971,7 +1325,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: '#007AFF',
+    color: '#40C4D4',
     fontWeight: '600',
   },
   historyCard: {
@@ -1018,6 +1372,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    overflow: 'hidden',
   },
   recentLabel: {
     fontSize: 16,
@@ -1037,6 +1392,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  sectionToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+  },
+  sectionToggleTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  curationInfo: {
+    flex: 1,
+    minWidth: 0,
+    paddingRight: 12,
+  },
+  curationRight: {
+    minWidth: 120,
+    alignItems: 'flex-end',
   },
   curationTitle: {
     fontSize: 16,
@@ -1051,6 +1428,9 @@ const styles = StyleSheet.create({
   curationPrice: {
     fontSize: 13,
     fontWeight: '700',
+    textAlign: 'right',
+    flexShrink: 0,
+    maxWidth: 140,
   },
   destinationCard: {
     backgroundColor: '#fff',
@@ -1077,7 +1457,7 @@ const styles = StyleSheet.create({
   destinationPrice: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#40C4D4',
   },
   offerCard: {
     backgroundColor: '#fff',

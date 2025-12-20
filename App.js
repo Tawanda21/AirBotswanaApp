@@ -6,7 +6,7 @@ const lightTheme = {
   card: '#fff',
   text: '#000',
   subtext: '#666',
-  accent: '#007AFF',
+  accent: '#40C4D4',
   gold: '#FFD700',
   error: '#ff4444',
   credit: '#4CAF50',

@@ -120,12 +120,11 @@ export default function WalletProfileScreen() {
             >
               <View style={styles.profileHeader}>
                 <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>CS</Text>
+                  <Text style={styles.avatarText}>TM</Text>
                 </View>
                 <View style={styles.profileInfo}>
                   <Text style={styles.profileName}>Tawanda Mudonhi</Text>
                   <Text style={styles.profileEmail}>tawandamudonhi@gmail.com</Text>
-                  <Text style={styles.membershipLevel}>Gold Member</Text>
                 </View>
                 <Animated.View style={{ marginLeft: 8, transform: [{ rotate: accountRotate }] }}>
                   <ChevronRight size={20} color="#666" />
@@ -160,6 +159,9 @@ export default function WalletProfileScreen() {
                   <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
                     <Text style={styles.settingLabel}>Personal Information</Text>
                     <ChevronRight size={20} color="#666" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.travelDocsButton} activeOpacity={0.7}>
+                    <Text style={styles.travelDocsButtonText}>+ Add Travel Documents</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
                     <Text style={styles.settingLabel}>Travel Preferences</Text>
@@ -319,7 +321,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#40C4D4',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -341,11 +343,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 2,
-  },
-  membershipLevel: {
-    fontSize: 14,
-    color: '#FFD700',
-    fontWeight: 'bold',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -460,7 +457,7 @@ const styles = StyleSheet.create({
   },
   cardType: {
     fontSize: 13,
-    color: '#007AFF',
+    color: '#40C4D4',
     fontWeight: '600',
   },
   cardExpiry: {
@@ -483,7 +480,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   addPaymentText: {
-    color: '#007AFF',
+    color: '#40C4D4',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -541,6 +538,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
     fontWeight: '500',
+  },
+  travelDocsButton: {
+    backgroundColor: '#40C4D4',
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 8,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+  travelDocsButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
   },
   settingArrow: {
     fontSize: 20,
